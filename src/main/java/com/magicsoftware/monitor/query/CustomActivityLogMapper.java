@@ -6,14 +6,16 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.magicsoftware.monitor.model.ActivityLog;
+import com.magicsoftware.monitor.model.ActivityLogColor;
 
-public class CustomActivityLogMapper implements RowMapper<ActivityLog> {
+//public class CustomActivityLogMapper implements RowMapper<ActivityLog>
+public class CustomActivityLogMapper implements RowMapper<ActivityLogColor>{
 
 	@Override
-	public ActivityLog mapRow(ResultSet rs, int rowNum) throws SQLException {
+	public ActivityLogColor mapRow(ResultSet rs, int rowNum) throws SQLException {
 		// TODO Auto-generated method stub
 		
-		ActivityLog activityLog = new ActivityLog();
+		ActivityLogColor activityLog = new ActivityLogColor();
 		
 		activityLog.setServerid(rs.getInt("SERVERID"));
 		activityLog.setMsgid(rs.getInt("MSGID"));

@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 import com.magicsoftware.xpi.server.common.Utils;
@@ -37,6 +38,12 @@ public class ODSData {
 	private Long ODSServerId;
 	private String versionKey;
 
+	@Transient
+	private String userKeyType;
+	
+//	private String createdDateTime;
+//	private String modifiedDateTime;
+
 	/**
 	 * Constructor
 	 * 
@@ -63,6 +70,21 @@ public class ODSData {
 	 * 
 	 * @return
 	 */
+	
+	public String getUserKeyType() {
+		if(global == 1) {
+			this.userKeyType = "Global";
+			}
+			else {
+				this.userKeyType = "Local";
+			}
+		return userKeyType;
+	}
+
+	public void setUserKeyType(String userKeyType) {
+		this.userKeyType = userKeyType;
+	}
+	
 	@Column(name = "serverid", scale = 0)
 	public Long getServerId() {
 		return this.serverId;
@@ -131,6 +153,7 @@ public class ODSData {
 	 * 
 	 * @return
 	 */
+	@JsonFormat(pattern="yyyy-dd-MM")
 	@Column(name = "userdate", length = 23)
 	public Date getUserDate() {
 		return this.userDate;
@@ -206,8 +229,13 @@ public class ODSData {
 	 * 
 	 * @return
 	 */
+	@JsonFormat(pattern="yyyy-dd-MM HH:mm:ss")
 	@Column(name = "createdate", length = 23)
 	public Date getCreateDate() {
+//		System.out.println("Create Date value :-"+this.createDate);
+//		String receivedToDateFromRTViewUser = this.createDate ;
+//		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-dd-MM HH:mm:ss");
+//		Date parsedDateObject = sdf.parse(receivedToDateFromRTViewUser);
 		return this.createDate;
 	}
 
@@ -240,6 +268,7 @@ public class ODSData {
 	 * 
 	 * @return
 	 */
+	@JsonFormat(pattern="yyyy-dd-MM HH:mm:ss")
 	@Column(name = "modifydate", length = 23)
 	public Date getModifyDate() {
 		return this.modifyDate;
@@ -259,6 +288,7 @@ public class ODSData {
 	 */
 	@Column(name = "modifytime", length = 6)
 	public String getModifyTime() {
+//		System.out.println("modified time "+this.modifyTime);
 		return this.modifyTime;
 	}
 
@@ -267,6 +297,7 @@ public class ODSData {
 	 * @param modifyTime
 	 */
 	public void setModifyTime(String modifyTime) {
+		
 		this.modifyTime = modifyTime;
 	}
 
@@ -394,4 +425,22 @@ public class ODSData {
 	public String getUserKey() {
 		return userKey;
 	}
+	
+//	
+//	public String getCreatedDateTime() {
+//		return createdDateTime;
+//	}
+//
+//	public void setCreatedDateTime(String createdDateTime) {
+//		this.createdDateTime = createdDateTime;
+//	}
+//
+//	public String getModifiedDateTime() {
+//		return modifiedDateTime;
+//	}
+//
+//	public void setModifiedDateTime(String modifiedDateTime) {
+//		this.modifiedDateTime = modifiedDateTime;
+//	}
+
 }

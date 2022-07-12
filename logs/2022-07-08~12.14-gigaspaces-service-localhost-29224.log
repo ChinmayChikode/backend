@@ -1,0 +1,27 @@
+2022-07-08 12:14:52,890  INFO [net.jini.discovery.LookupLocatorDiscovery] - Connected to LUS using locator localhost:4174
+2022-07-08 12:14:53,248  INFO [com.sun.jini.mahalo.startup] - Started Mahalo (duration=0.016): com.sun.jini.mahalo.TransientMahaloImpl@2433e779
+2022-07-08 12:14:53,880  INFO [net.jini.discovery.LookupLocatorDiscovery] - Connected to LUS using locator localhost:4174
+2022-07-08 12:14:54,428  INFO [org.apache.coyote.http11.Http11NioProtocol] - Starting ProtocolHandler ["http-nio-8098"]
+2022-07-08 12:14:54,617  INFO [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-07-08 12:14:55,351  INFO [com.sun.jini.mahalo.startup] - Started Mahalo (duration=0.003): com.sun.jini.mahalo.TransientMahaloImpl@7a3255fe
+2022-07-08 12:26:01,312  INFO [org.apache.coyote.http11.Http11NioProtocol] - Pausing ProtocolHandler ["http-nio-8098"]
+2022-07-08 12:26:01,703  INFO [org.apache.catalina.core.StandardService] - Stopping service [Tomcat]
+2022-07-08 12:26:01,706  INFO [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]] - Destroying Spring FrameworkServlet 'dispatcherServlet'
+2022-07-08 12:26:01,709  WARNING [org.apache.catalina.loader.WebappClassLoaderBase] - The web application [ROOT] appears to have started a thread named [GS-settleThread] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base@11.0.14/java.lang.Object.wait(Native Method)
+ java.base@11.0.14/java.lang.Object.wait(Object.java:328)
+ app//com.sun.jini.mahalo.TxnManagerImpl.settleTxns(TxnManagerImpl.java:1330)
+ app//com.sun.jini.mahalo.TxnManagerImpl.access$200(TxnManagerImpl.java:111)
+ app//com.sun.jini.mahalo.TxnManagerImpl$2.run(TxnManagerImpl.java:716)
+2022-07-08 12:26:01,709  WARNING [org.apache.catalina.loader.WebappClassLoaderBase] - The web application [ROOT] appears to have started a thread named [GS-MAGIC_INFO-router-threadpool] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base@11.0.14/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base@11.0.14/java.util.concurrent.locks.LockSupport.park(LockSupport.java:194)
+ java.base@11.0.14/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2081)
+ java.base@11.0.14/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1170)
+ java.base@11.0.14/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+ java.base@11.0.14/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1054)
+ java.base@11.0.14/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1114)
+ java.base@11.0.14/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+ java.base@11.0.14/java.lang.Thread.run(Thread.java:829)
+2022-07-08 12:26:01,710  INFO [org.apache.coyote.http11.Http11NioProtocol] - Stopping ProtocolHandler ["http-nio-8098"]
+2022-07-08 12:26:01,712  INFO [org.apache.coyote.http11.Http11NioProtocol] - Destroying ProtocolHandler ["http-nio-8098"]

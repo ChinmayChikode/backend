@@ -63,6 +63,9 @@ public class QueryFilters {
 	@JsonProperty("userkey2")
 	private String userkey2 = "";
 
+	@JsonProperty("userblob")
+	private String userblob = "";
+	
 	@JsonProperty("statusCode")
 	private String statusCode = "";
 
@@ -106,13 +109,7 @@ public class QueryFilters {
 	@JsonProperty("actMsgFiltersMetadata")
 	private List<ActivityMsgFilterMetadata> actMsgFiltersMetadata;
 
-	// private boolean displayFileExistsFlag = false;
-
-	@JsonProperty("page")
-	private Integer page = 0;
-
-	@JsonProperty("size")
-	private Integer size = 0;
+	//private boolean displayFileExistsFlag = false;
 
 	public String getUserKeyODS() {
 		return UserKeyODS;
@@ -392,22 +389,6 @@ public class QueryFilters {
 
 	public void setActMsgFiltersMetadata(List<ActivityMsgFilterMetadata> actMsgFiltersMetadata) {
 		this.actMsgFiltersMetadata = actMsgFiltersMetadata;
-	}
-
-	public Integer getPage() {
-		return page;
-	}
-
-	public void setPage(Integer page) {
-		this.page = page;
-	}
-
-	public Integer getSize() {
-		return size;
-	}
-
-	public void setSize(Integer size) {
-		this.size = size;
 	}
 
 //	public boolean isDisplayFileExistsFlag() {
