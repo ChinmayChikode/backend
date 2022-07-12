@@ -73,31 +73,15 @@ public class QueryFactory {
 			 * DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM,
 			 * Locale.getDefault());
 			 */
-//			String pattern = defaultLocalFormat.toPattern();
-//			System.out.println("pattern" + pattern);
-			SimpleDateFormat formatForReceivedDateParsing = new SimpleDateFormat(defaultLocalFormat.toPattern());
-			System.out.println("formatForRecievedDateParsing " +formatForReceivedDateParsing );
-			
+			String pattern = defaultLocalFormat.toPattern();
+			SimpleDateFormat formatForReceivedDateParsing = new SimpleDateFormat(pattern);
 
 			if ((queryFilters.getLblFromDateValue()) != null
 					&& !((queryFilters.getLblFromDateValue()).equalsIgnoreCase(""))) {
 
-//				String receivedFromDateFromRTViewUser = queryFilters.getLblFromDateValue();
-//
-//				Date parsedDateObject = formatForReceivedDateParsing.parse(receivedFromDateFromRTViewUser);
-//				System.out.println("parsed date object "+parsedDateObject);
-//				String date="22-01-2021 11:35:19";
-//		        SimpleDateFormat sdf=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-//		        Date currentdate=sdf.parse(date);
-//		        SimpleDateFormat sdf2=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-//		        System.out.println(sdf2.format(currentdate));
-
 				String receivedFromDateFromRTViewUser = queryFilters.getLblFromDateValue();
-				SimpleDateFormat sdf=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-				Date parsedDateObject = sdf.parse(receivedFromDateFromRTViewUser);
-//				SimpleDateFormat sdf2=new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
-//		        System.out.println("Date: "+sdf2.format(parsedDateObject));
-				
+
+				Date parsedDateObject = formatForReceivedDateParsing.parse(receivedFromDateFromRTViewUser);
 		
 				String formattedStringDateForDBFilter = null;
 
@@ -116,8 +100,8 @@ public class QueryFactory {
 					&& !((queryFilters.getLblToDateValue()).equalsIgnoreCase(""))) {
 
 				String receivedToDateFromRTViewUser = queryFilters.getLblToDateValue();
-				SimpleDateFormat sdf=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-				Date parsedDateObject = sdf.parse(receivedToDateFromRTViewUser);
+
+				Date parsedDateObject = formatForReceivedDateParsing.parse(receivedToDateFromRTViewUser);
 			
 				String formattedStringDateForDBFilter = null;
 				if ((removeDotFromDatabaseDialect.toUpperCase())

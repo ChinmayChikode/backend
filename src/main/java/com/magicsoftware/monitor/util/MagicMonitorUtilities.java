@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,7 +81,7 @@ public class MagicMonitorUtilities {
 		}
 	}
 
-	public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM,dd yyyy HH:mm:ss.SSS");
+	public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
 	private static BufferedReader fileReader;
 
 	public static String readPropertyValueFromIFSINIFile(String filename, String groupname, String property) {
@@ -401,65 +400,6 @@ public class MagicMonitorUtilities {
 	public static String formatDate(Date date) {
 		return simpleDateFormat.format(date);
 	}
-	
-	public static String changeStringtoDatefinal(String string) throws ParseException {
-		String createTime = string;
-		String year = createTime.substring(0,4);
-		String month = createTime.substring(4,6);
-		String day = createTime.substring(6,8);
-		String hr = createTime.substring(8,10);
-		Integer hr1=Integer.valueOf(hr);
-		Integer hrf=hr1-12;
-		String min = createTime.substring(10,12);
-		String sec = createTime.substring(12,14);		
-		String createTime1 =year+"-"+month+"-"+day+" " + hr+":"+ min+":"+ sec + " AM";
-	//	System.out.println(createTime1);
-		
-		if(hrf>=0)
-		{
-			if(hrf==0) 
-			{
-				String createTime2 =year+"-"+month+"-"+day+" " + hr+":"+ min+":"+ sec + " PM";
-				//System.out.println(createTime2);
-				return createTime2;
-			}
-			else
-			{
-				if(hr1<=21)
-				{
-					String createTime2 =year+"-"+month+"-"+day+" " +"0"+ hrf+":"+ min+":"+ sec + " PM";
-					//System.out.println(createTime2);
-					return  createTime2;
-				}
-				else 
-				{
-					String createTime2 =year+"-"+month+"-"+day+" " + hrf+":"+ min+":"+ sec + " PM";
-					//System.out.println(createTime2);
-					return  createTime2;			   
-				}
-				
-			}
-			
-		}
-		else
-			{
-			  if(hr1==00)
-			  {
-				  int hr2=hr1;
-				  hr2+=12;
-				  String createTime3 =year+"-"+month+"-"+day+" " + hr2+":"+ min+":"+ sec + " AM";
-				  return createTime3;
-			  }	  
-			  else
-			  {
-				  return createTime1;  
-			  }
-			  
-		}
-	}		
-	
-	
-	
 
 	public static String getTriggerType(int typeId) {
 		String triggerType = "";
@@ -764,7 +704,6 @@ public static List<String> getTriggerTypes(){
 		allTriggerTypes.add("Exchange");
 		allTriggerTypes.add("Sugar");
 		allTriggerTypes.add("Scheduler Utility");
-		allTriggerTypes.add("Scheduler Service");
 		allTriggerTypes.add("TCP Listener");
 		allTriggerTypes.add("Component SDK");
 		
@@ -1068,7 +1007,7 @@ public static List<String> getTriggerTypes(){
 			writeActLogFiltersDataToWriteXML(actlogWriteXMLAtProjectLevel, queryFilters);
 
 			// Call Enable Logging Function : Temporary Disable on : 04-04-2020
-			enableLogging(actlogWriteXMLAtProjectLevel, queryFilters.getProjKey());
+			//enableLogging(actlogWriteXMLAtProjectLevel, queryFilters.getProjKey());
 
 			/* } */
 		} catch (Exception ex) {
@@ -1218,37 +1157,5 @@ public static List<String> getTriggerTypes(){
 
 		return msgInvoTypes;
 	}
-public static List<String> getBamCategory(){
-		
-		List<String> allBamCategory = new ArrayList<String>();
-		allBamCategory.add("All");
-		allBamCategory.add("ONE");
-		allBamCategory.add("3");
-		
-		
-		return allBamCategory;
-	}
-
-	public static List<String> getBamPriority(){
-	
-		List<String> allBamPriority = new ArrayList<String>();
-		allBamPriority.add("All");
-		allBamPriority.add("1");
-		allBamPriority.add("2");
-		
-		
-		return allBamPriority;
-	}
-
-	public static List<String> getOdsType(){
-	
-	List<String> allOdsType = new ArrayList<String>();
-	allOdsType.add("ALL");
-	allOdsType.add("Global");
-	allOdsType.add("Local");
-	
-	return allOdsType;
-	}
 
 }
-

@@ -10,15 +10,6 @@ public class ServerDetails {
 	private List<HostModel> hostList;
 	private List<StatusModel> statusList;
 	private List<LicenseModel> licenseFeatureList;
-	private Integer totalmessagesprocessed;
-
-	public Integer getTotalmessagesprocessed() {
-		return totalmessagesprocessed;
-	}
-
-	public void setTotalmessagesprocessed(Integer totalmessagesprocessed) {
-		this.totalmessagesprocessed = totalmessagesprocessed;
-	}
 
 	public ServerData[] getServerData() {
 		return serverData;

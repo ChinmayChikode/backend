@@ -2,7 +2,6 @@ package com.magicsoftware.monitor.serviceimpl;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -49,10 +48,8 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.cache.LoadingCache;
 import com.magicsoftware.monitor.model.ActivityMsgFilterMetadata;
-import com.magicsoftware.monitor.model.BpModel;
 import com.magicsoftware.monitor.model.BpWithFlow;
 import com.magicsoftware.monitor.model.FlowDetails;
-import com.magicsoftware.monitor.model.FlowModel;
 import com.magicsoftware.monitor.model.FlowRequestMessages;
 import com.magicsoftware.monitor.model.FlowWithTrigger;
 import com.magicsoftware.monitor.model.HostModel;
@@ -61,14 +58,9 @@ import com.magicsoftware.monitor.model.MagicXpiHostAndEngines;
 import com.magicsoftware.monitor.model.MagicXpiSpaceInstances;
 import com.magicsoftware.monitor.model.MessagesDetails;
 import com.magicsoftware.monitor.model.MonitorOfflineMetadata;
-import com.magicsoftware.monitor.model.PSSWithFLowName;
 import com.magicsoftware.monitor.model.QueryFilters;
-import com.magicsoftware.monitor.model.SchedulerData;
-import com.magicsoftware.monitor.model.SchedulerDetails;
 import com.magicsoftware.monitor.model.ServerAndWorkerData;
 import com.magicsoftware.monitor.model.ServerDetails;
-import com.magicsoftware.monitor.model.ServerInstance;
-import com.magicsoftware.monitor.model.ServerInstanceDetails;
 import com.magicsoftware.monitor.model.TriggerActivityGraphRes;
 import com.magicsoftware.monitor.model.TriggerActivityModel;
 import com.magicsoftware.monitor.model.TriggerDetails;
@@ -134,7 +126,7 @@ public class SpaceServiceImpl implements SpaceService {
 		rtvEntity.connect(spaceName, spaceGroup, spaceLocators);
 		rtvEntity.isMonitorLicensed();
 		spaceServices = new SpaceServices();
-		spaceDiscoveryObject = new SpaceDiscoveryObject("Magic_xpi_4.13_CHINMAYCLPT",
+		spaceDiscoveryObject = new SpaceDiscoveryObject("Magic_xpi_4.13_SUDEEPMLPT",
 				"localhost");
 		admin = new Admin(spaceDiscoveryObject);
 		rtvInfoEntityObject = getRTVEntityInfoInstance();
@@ -161,19 +153,12 @@ public class SpaceServiceImpl implements SpaceService {
 		FlowLoop: for (int i = 0; i < flowData.length; i++) {
 
 			BPLoop: for (int j = 0; j < monitorOfflineMetadata.getBpList().size(); j++) {
-//				if (monitorOfflineMetadata.getBpList().get(j).getBpId() != null && flowData[i].getBpId() == Integer
-//						.valueOf(monitorOfflineMetadata.getBpList().get(j).getBpId())) {
-//
-//					flowData[i].setBpName("[" + flowData[i].getBpId() + "]" + " "
-//							+ monitorOfflineMetadata.getBpList().get(j).getBpName());
-//					flowData[i].setFlowName("[" + flowData[i].getFlowId() + "]" + " " + flowData[i].getFlowName());
-//
-//				}
 				if (monitorOfflineMetadata.getBpList().get(j).getBpId() != null && flowData[i].getBpId() == Integer
 						.valueOf(monitorOfflineMetadata.getBpList().get(j).getBpId())) {
 
-					flowData[i].setBpName(monitorOfflineMetadata.getBpList().get(j).getBpName());
-					flowData[i].setFlowName(flowData[i].getFlowName());
+					flowData[i].setBpName("[" + flowData[i].getBpId() + "]" + " "
+							+ monitorOfflineMetadata.getBpList().get(j).getBpName());
+					flowData[i].setFlowName("[" + flowData[i].getFlowId() + "]" + " " + flowData[i].getFlowName());
 
 				}
 			}
@@ -200,12 +185,6 @@ public class SpaceServiceImpl implements SpaceService {
 	@Override
 	public WorkerData[] worker() {
 		return spaceServices.getAllWorkers(1);
-	}
-	
-	@Override
-	public WorkerData[] worker_practice() {
-		return spaceServices.getAllWorkers(1);
-		//return null;
 	}
 
 	@Override
@@ -307,7 +286,6 @@ public class SpaceServiceImpl implements SpaceService {
 		ServerData[] serverData = spaceServices.getAllServers(projectkey);
 		List<HostModel> hostList = null;
 		List<LicenseModel> licenseFeatureList = null;
-		int totalmessageprocessed=spaceServices.totalRequestServed(projectkey);
 		
 		if (serverData != null) {
 			
@@ -347,11 +325,9 @@ public class SpaceServiceImpl implements SpaceService {
 		serverDetails.setStatusList(MagicMonitorUtilities.getServerStatuses());
 		serverDetails.setLicenseFeatureList(licenseFeatureList);
 		serverDetails.setServerData(serverData);
-		serverDetails.setTotalmessagesprocessed(totalmessageprocessed);
 		
 		return serverDetails;
 	}
-
 
 	@Override
 	public TriggerData[] triggers(String projectkey) {
@@ -381,37 +357,30 @@ public class SpaceServiceImpl implements SpaceService {
 			triggerData[i].setLastMessagedAtDate(MagicMonitorUtilities.formatDate(triggerData[i].getLastIsAlive()));
 			triggerData[i].setTriggerType(MagicMonitorUtilities.getTriggerType(triggerData[i].getTriggerTypeId()));
 
-			if(SpaceServiceImpl.monitorOfflineMetadata != null && SpaceServiceImpl.monitorOfflineMetadata.getBpList() != null) {
-				BPLoop: for (int j = 0; j < monitorOfflineMetadata.getBpList().size(); j++) {
+			BPLoop: for (int j = 0; j < monitorOfflineMetadata.getBpList().size(); j++) {
 
-					if (monitorOfflineMetadata.getBpList().get(j).getBpId() != null && triggerData[i].getBpId() == Long
-							.valueOf(monitorOfflineMetadata.getBpList().get(j).getBpId())) {
+				if (monitorOfflineMetadata.getBpList().get(j).getBpId() != null && triggerData[i].getBpId() == Long
+						.valueOf(monitorOfflineMetadata.getBpList().get(j).getBpId())) {
 
-						triggerData[i].setBpName(monitorOfflineMetadata.getBpList().get(j).getBpName());
+					triggerData[i].setBpName(monitorOfflineMetadata.getBpList().get(j).getBpName());
 
-						FlowLoop: for (int k = 0; k < monitorOfflineMetadata.getFlowList().size(); k++) {
+					FlowLoop: for (int k = 0; k < monitorOfflineMetadata.getFlowList().size(); k++) {
 
-							if (monitorOfflineMetadata.getFlowList().get(k).getFlowId() != null && triggerData[i]
-									.getFlowId() == Long.valueOf(monitorOfflineMetadata.getFlowList().get(k).getFlowId())) {
+						if (monitorOfflineMetadata.getFlowList().get(k).getFlowId() != null && triggerData[i]
+								.getFlowId() == Long.valueOf(monitorOfflineMetadata.getFlowList().get(k).getFlowId())) {
 
-								triggerData[i].setFlowName(monitorOfflineMetadata.getFlowList().get(k).getFlowName());
+							triggerData[i].setFlowName(monitorOfflineMetadata.getFlowList().get(k).getFlowName());
 
-								continue BPLoop;
-							}
+							continue BPLoop;
 						}
-
 					}
+
 				}
 			}
-
-		}
-		if(SpaceServiceImpl.monitorOfflineMetadata != null && SpaceServiceImpl.monitorOfflineMetadata.getBpList() != null) {
-			triggerDetails.setBpList(monitorOfflineMetadata.getBpList());
-		}
-		if(SpaceServiceImpl.monitorOfflineMetadata != null && SpaceServiceImpl.monitorOfflineMetadata.getFlowList()!= null) {
-			triggerDetails.setFlowList(monitorOfflineMetadata.getFlowList());
 		}
 		
+		triggerDetails.setBpList(monitorOfflineMetadata.getBpList());
+		triggerDetails.setFlowList(monitorOfflineMetadata.getFlowList());
 		triggerDetails.setTriggerTypes(MagicMonitorUtilities.getTriggerTypes());
 		triggerDetails.setTriggerStates(MagicMonitorUtilities.getTriggerStates());
 		triggerDetails.setTriggerData(triggerData);	
@@ -550,178 +519,11 @@ public class SpaceServiceImpl implements SpaceService {
 	public Scheduler[] getScheduler() {
 		return spaceServices.getSchedulers("");
 	}
-	
-	@Override
-	public SchedulerDetails getscheduler(String projectKey, String projectLocation) 
-	   {
-			//SchedulerArray schedulerfinalarray=new SchedulerArray();
-			SchedulerDetails schedulerdetails = new SchedulerDetails();
-	    	Scheduler [] schedulers=spaceServices.getSchedulers("");	
-	    	
-	    	//SchedulerData schedulerData =new SchedulerData();
-	    	List<Scheduler []> SchedulerList=new ArrayList<>();
-	    	SchedulerList.add(schedulers);
 
-	    	List<SchedulerData> SchedulerDataList=new ArrayList<>();
-	    	
-	    	MonitorOfflineMetadata monitorOfflineMetadata =
-	    			  MagicMonitorUtilities.readMonitorOfflineMetadata(projectKey,
-	    			  projectLocation);
-	    	
-	        for (int i = 0; i < schedulers.length; i++) {
-	        			SchedulerData schedulerChild=new SchedulerData();
-	        			schedulerChild.setBpId(schedulers[i].getBpId());
-	    	        	schedulerChild.setFlowId(schedulers[i].getFlowId());
-	    	        	schedulerChild.setServerId(schedulers[i].getServerId());
-	    	        	schedulerChild.setIsn(schedulers[i].getIsn());
-	    	        	schedulerChild.setType(schedulers[i].getType());
-	    	        	schedulerChild.setExecDataTime(schedulers[i].getExecDataTime());
-	    	        	schedulerChild.setSchedulerId(schedulers[i].getSchedulerId());
-	    	        	schedulerChild.setStepId(schedulers[i].getStepId());
-	    	        	schedulerChild.setVersionKey(schedulers[i].getVersionKey());
-	    	        	schedulerChild.setSchedulerName(schedulers[i].getSchedulerName());
-	    	        	schedulerChild.setUid(schedulers[i].getUid());	        
-	    	        	  try {
-	  						schedulerChild.setExecDateTimeOrg(MagicMonitorUtilities.changeStringtoDatefinal(schedulers[i].getExecDateTimeOrg()));
-	  					} catch (ParseException e) {
-	  						// TODO Auto-generated catch block
-	  						e.printStackTrace();
-	  					}
-	    	        	
-	    	        	
-				BPLoop: for (int j = 0; j <monitorOfflineMetadata.getBpList().size(); j++) {
-					if (monitorOfflineMetadata.getBpList().get(j).getBpId() != null && schedulers[i].getBpId() == Long
-							.valueOf(monitorOfflineMetadata.getBpList().get(j).getBpId())) {
-					
-		 			    
-						
-						schedulerChild.setBpName(monitorOfflineMetadata.getBpList().get(j).getBpId()+ " "
-								+ monitorOfflineMetadata.getBpList().get(j).getBpName());
-						schedulerChild.setBpName(monitorOfflineMetadata.getBpList().get(j).getBpName());
-						
-						FlowLoop: for (int k = 0; k < monitorOfflineMetadata.getFlowList().size(); k++) {
-							if (monitorOfflineMetadata.getFlowList().get(k).getFlowId() != null
-									&& schedulers[i].getFlowId() == Long
-											.valueOf(monitorOfflineMetadata.getFlowList().get(k).getFlowId())) {
-								schedulerChild.setFlowName(monitorOfflineMetadata.getFlowList().get(k).getFlowName());
-							
-								continue BPLoop;
-							}
-						}
-					}
-				}
-	    		SchedulerDataList.add(schedulerChild);
-	    	}
-	        
-
-	        schedulerdetails.setScheduler(SchedulerDataList);
-		    schedulerdetails.setSchedulermain(schedulers);
-		    //schedulerdetails.setCombined(combined);
-		    
-		    return schedulerdetails;  	
-	   }
-	
 	@Override
-	public int invokeFlowByScheduler(String projectKey, int bpId, int flowId, int triggerId, int schedulerId) throws InstantiationException, IllegalAccessException, ApplicationException {	
-		
-	return rtvEntity.invokeFlowByScheduler(projectKey,bpId,flowId,triggerId,schedulerId);
+	public PSSData[] getPSSData(String projectKey) {
+		return spaceServices.getProjectPssData(projectKey);
 	}
-	
-
-
-//	@Override
-//	public PSSData[] getPSSData(String projectKey) {
-//		return spaceServices.getProjectPssData(projectKey);
-//	}
-	
-	//New method 1 for subscription data
-		//@Override
-		public List<PSSWithFLowName> getPSSDataWithFLowName(String projectKey, String projectLocation) {
-			
-			  MonitorOfflineMetadata monitorOfflineMetadata =
-			  MagicMonitorUtilities.readMonitorOfflineMetadata(projectKey,projectLocation);
-			
-			 List<BpModel> bpList = monitorOfflineMetadata.getBpList();
-			 List<FlowModel> flowList = monitorOfflineMetadata.getFlowList();
-			 
-			 PSSData[] data = spaceServices.getProjectPssData(projectKey);
-			 List<PSSWithFLowName> pssData = new ArrayList<PSSWithFLowName>();
-			 
-		 
-			 for(PSSData item:data) {
-
-				 PSSWithFLowName newdata = new PSSWithFLowName();
-				 String  uid = item.getUid();
-				 newdata.setUid(uid);
-				 
-				 String  pk = item.getProjectKey();
-				 newdata.setProjectKey(pk);
-				 
-				 int  bpid = item.getBpId();
-				 newdata.setBpId(bpid);
-				 
-				 int fid = item.getFlowId();
-				 newdata.setFlowId(fid);
-				 
-				 String  pss = item.getPssName();
-				 newdata.setPssName(pss);
-				 
-				 boolean  ot = item.getOneTime();
-				 newdata.setOneTime(ot);
-				 
-				 Date  ts = item.getCreatedTimestamp();
-				 newdata.setCreatedTimestamp(ts);
-				 
-				 newdata.setFlowName(getFlowName(item.getFlowId() , flowList));
-				 newdata.setBpName(getbpName(item.getBpId() , bpList));	
-				 
-				 pssData.add(newdata);
-			 }
-			 
-			 
-			 for(PSSWithFLowName item:pssData) {
-				 System.out.println(item.getFlowName());
-			 }
-
-			return pssData;
-			
-		}
-		
-		//new Method 2
-		public String getFlowName(int flowid, List<FlowModel> flowList)
-		{
-			String flowName = "";
-			for(FlowModel item:flowList)
-			{
-				if(String.valueOf(flowid).equals(item.getFlowId()))
-				{
-					System.out.println("Match found for flow id:=" + flowid);
-					System.out.println("Flowname is :=" + item.getFlowName());
-					flowName = item.getFlowName();
-					break;
-				}
-			
-			}
-			return flowName;
-		}
-		
-		//new method 3
-	private String getbpName(int bpId, List<BpModel> bpList) {	
-			
-		String bpName = "";
-		for(BpModel item:bpList)
-		{
-			if(String.valueOf(bpId).equals(item.getBpId()))
-			{
-				bpName = item.getBpName();
-				break;
-			}
-		
-		}
-		return bpName;
-		}
-
-
 
 	@Override
 	public FlowReqHistory[] getFlowReqHistory() {
@@ -1165,8 +967,8 @@ public class SpaceServiceImpl implements SpaceService {
 			dateTime = LocalDateTime.now().minus(Duration.of(3, ChronoUnit.DAYS));
 		}
 		long milliSeconds = Timestamp.valueOf(dateTime).getTime();
-		List<TriggerActivityModel> res = new ArrayList<TriggerActivityModel>();  //series
-		List<String> res1 = new ArrayList<String>();  // categories
+		List<TriggerActivityModel> res = new ArrayList<TriggerActivityModel>();
+		List<String> res1 = new ArrayList<String>();
 		List<TriggerActivityMessages> result = spaceServices.getTriggersActivityStatistics(projectkey, milliSeconds);
 
 		result.forEach(action -> {
@@ -1356,36 +1158,4 @@ public class SpaceServiceImpl implements SpaceService {
 			}
 		}
 	}
-
-	@Override
-	public PSSData[] getPSSData(String projectKey) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String newServerInstance(String projectkey, String Server_host, String Alternate_host,
-			 String project_directory, int Number_of_instances, Boolean Load_triggers,
-		     Boolean Load_Schedulers, Boolean Load_auto_start, int Number_of_workers) {
-		
-		System.out.println("Inside"+ projectkey+" "+Server_host+" "+Alternate_host+" "+
-				 project_directory+ " "+ Number_of_instances+" "+Load_triggers+" "+
-			     Load_Schedulers+" "+Load_auto_start+" "+Number_of_workers);
-		
-		for(int i=0;i<Number_of_instances;i++)
-		{
-			try {
-				rtvEntity.runNewServer(projectkey, Server_host, project_directory,Load_triggers, Load_Schedulers, Load_auto_start,
-				         Number_of_workers, Alternate_host);
-			} catch (ApplicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}	
-		
-		return null;
-
-	}
-
-	
 }

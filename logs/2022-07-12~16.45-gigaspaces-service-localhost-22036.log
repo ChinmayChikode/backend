@@ -1,6 +1,0 @@
-2022-07-12 16:45:23,598  INFO [net.jini.discovery.LookupLocatorDiscovery] - Connected to LUS using locator localhost:4174
-2022-07-12 16:45:23,978  INFO [com.sun.jini.mahalo.startup] - Started Mahalo (duration=0.023): com.sun.jini.mahalo.TransientMahaloImpl@52ce1d96
-2022-07-12 16:45:24,945  INFO [org.apache.coyote.http11.Http11NioProtocol] - Starting ProtocolHandler ["http-nio-8098"]
-2022-07-12 16:59:22,145  INFO [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2022-07-12 16:59:22,279  INFO [com.sun.jini.mahalo.startup] - Started Mahalo (duration=0.003): com.sun.jini.mahalo.TransientMahaloImpl@72f7a256
-2022-07-12 21:43:45,577  INFO [net.jini.discovery.LookupLocatorDiscovery] - Connected to LUS using locator localhost:4174

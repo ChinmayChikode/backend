@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "magic.space.name",
+    "type": "java.lang.String",
+    "description": "A description for 'magic.space.name'"
+  },
+  {
+    "name": "magic.space.group",
+    "type": "java.lang.String",
+    "description": "A description for 'magic.space.group'"
+  },
+  {
+    "name": "magic.space.locators",
+    "type": "java.lang.String",
+    "description": "A description for 'magic.space.locators'"
+  },
+  {
+    "name": "datasource.file.name",
+    "type": "java.lang.String",
+    "description": "A description for 'datasource.file.name'"
+  }
+]}

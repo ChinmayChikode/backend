@@ -1,8 +1,0 @@
-2022-07-07 17:47:12,046  INFO [net.jini.discovery.LookupLocatorDiscovery] - Connected to LUS using locator localhost:4174
-2022-07-07 17:47:12,435  INFO [com.sun.jini.mahalo.startup] - Started Mahalo (duration=0.017): com.sun.jini.mahalo.TransientMahaloImpl@3fdb505a
-2022-07-07 17:47:13,181  INFO [net.jini.discovery.LookupLocatorDiscovery] - Connected to LUS using locator localhost:4174
-2022-07-07 17:47:13,821  INFO [org.apache.coyote.http11.Http11NioProtocol] - Starting ProtocolHandler ["http-nio-8098"]
-2022-07-07 17:47:13,825  INFO [org.apache.coyote.http11.Http11NioProtocol] - Pausing ProtocolHandler ["http-nio-8098"]
-2022-07-07 17:47:13,825  INFO [org.apache.catalina.core.StandardService] - Stopping service [Tomcat]
-2022-07-07 17:47:13,829  INFO [org.apache.coyote.http11.Http11NioProtocol] - Stopping ProtocolHandler ["http-nio-8098"]
-2022-07-07 17:47:13,830  INFO [org.apache.coyote.http11.Http11NioProtocol] - Destroying ProtocolHandler ["http-nio-8098"]

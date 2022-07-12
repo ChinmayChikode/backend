@@ -12,7 +12,7 @@
 	<groupId>com.magic.monitor</groupId>
 	<artifactId>magicmonitor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>magicmonitor</name>
+	<name>magicmonitorapi</name>
 	<packaging>war</packaging>
 	<description>Demo project for Spring Boot</description>
 
@@ -49,6 +49,7 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
+			<!--<version>8.4.1.jre8</version> -->
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -56,11 +57,6 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-		      <groupId>org.springframework.boot</groupId>
-		      <artifactId>spring-boot-starter-tomcat</artifactId>
-		      <scope>provided</scope>
-  		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>io.springfox</groupId> -->
 		<!-- <artifactId>springfox-swagger2</artifactId> -->
@@ -178,13 +174,13 @@
 	</dependencies>
 
 	<build>
+	<finalName>magicmonitorapi</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>magicmonitor</finalName>
 	</build>
 
 </project>

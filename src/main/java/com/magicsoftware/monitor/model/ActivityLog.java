@@ -1,17 +1,12 @@
 package com.magicsoftware.monitor.model;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "ifs_actlog")
@@ -30,7 +25,6 @@ public class ActivityLog {
 	private byte[] userblob;
 	private Integer usercode;
 
-	@JsonFormat(pattern="MMM dd, yyyy HH:mm:ss")
 	@Column(name = "CREATETIMESTAMP")
 	private Timestamp createTimeStamp;
 
@@ -49,6 +43,9 @@ public class ActivityLog {
 	private String filelocation;
 	private String runId;
 	
+	@Transient
+	private String color;
+
 	@Transient
 	private String serverName;
 
@@ -72,6 +69,46 @@ public class ActivityLog {
 
 	@Transient
 	private java.util.Date dateOfWritingToSpace = new java.util.Date();
+	
+	public ActivityLog(ActivityLog activityLog) {
+		this.msgid = activityLog.getMsgid();
+		this.bpid = activityLog.getBpid();
+		this.flowid = activityLog.getFlowid();
+		this.fsid = activityLog.getFsid();
+		this.fsstep = activityLog.getFsstep();
+		this.messagetypeid = activityLog.getMessagetypeid();
+		this.messagestring = activityLog.getMessagestring();
+		this.userblob = activityLog.getUserblob();
+		this.usercode = activityLog.getUsercode();
+		this.createTimeStamp = activityLog.getCreateTimeStamp();
+		this.objectlevel = activityLog.getObjectlevel();
+		this.category = activityLog.getCategory();
+		this.userkey1 = activityLog.getUserkey1();
+		this.userkey2 = activityLog.getUserkey2();
+		this.versionkey = activityLog.getVersionkey();
+		this.statuscode = activityLog.getStatuscode();
+		this.severity = activityLog.getSeverity();
+		this.extension = activityLog.getExtension();
+		this.projectkey = activityLog.getProjectkey();
+		this.blobexists = activityLog.getBlobexists();
+		this.rootfsid = activityLog.getRootfsid();
+		this.flowrequestid = activityLog.getFlowrequestid();
+		this.filelocation = activityLog.getFilelocation();
+		this.runId = activityLog.getRunId();
+		this.color = activityLog.getColor();
+		this.serverName = activityLog.getServerName();
+		this.bpName = activityLog.getBpName();
+		this.flowName = activityLog.getFlowName();
+		this.stepName = activityLog.getStepName();
+		this.messageType = activityLog.getMessageType();
+		this.displayCreatedTime = activityLog.getDisplayCreatedTime();
+		this.totalNumberOfRecords = activityLog.getTotalNumberOfRecords();
+		this.dateOfWritingToSpace = activityLog.getDateOfWritingToSpace();
+	}
+	
+	public ActivityLog() {
+		
+	}
 
 	public Integer getServerid() {
 		return serverid;
@@ -137,9 +174,8 @@ public class ActivityLog {
 		this.messagestring = messagestring;
 	}
 
-	@Column(name = "userblob")
 	public byte[] getUserblob() {
-		return this.userblob;
+		return userblob;
 	}
 
 	public void setUserblob(byte[] userblob) {
@@ -154,15 +190,8 @@ public class ActivityLog {
 		this.usercode = usercode;
 	}
 
-//	public Timestamp getCreateTimeStamp() {
-//		return createTimeStamp;
-//	}
-	
-	@JsonFormat(pattern="MMM dd, yyyy hh:mm:ss.SSS")
-	@Column(name = "CREATETIMESTAMP")
 	public Timestamp getCreateTimeStamp() {
-	//	System.out.println("Create Date value :-"+this.createTimeStamp);
-	 	return createTimeStamp;
+		return createTimeStamp;
 	}
 
 	public void setCreateTimeStamp(Timestamp createTimeStamp) {
@@ -325,14 +354,9 @@ public class ActivityLog {
 		return displayCreatedTime;
 	}
 
-	public void setDisplayCreatedTime(String displayCreatedTime){
-//		SimpleDateFormat sdf=new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
-//		Date parsedDateObject = sdf.parse(displayCreatedTime);
-//		this.displayCreatedTime = sdf.format(parsedDateObject);
+	public void setDisplayCreatedTime(String displayCreatedTime) {
 		this.displayCreatedTime = displayCreatedTime;
 	}
-	
-
 
 	public java.util.Date getDateOfWritingToSpace() {
 		return dateOfWritingToSpace;
@@ -350,6 +374,12 @@ public class ActivityLog {
 		this.totalNumberOfRecords = totalNumberOfRecords;
 	}
 
-	
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
 
 }

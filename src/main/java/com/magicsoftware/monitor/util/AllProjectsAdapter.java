@@ -107,14 +107,14 @@ public class AllProjectsAdapter {
 												projectPath = projectPath.replace("\\", "/");
 
 												if (isExist(startXMLFilePath) && isExist(ifsIniFilePath) && (projectName != null && !projectName.equalsIgnoreCase("")))	{
-													//System.out.println(startXMLFilePath);
+													
 													projectpathWithStartXML = projectpathWithStartXML.replace("\\\\", "/");
 													projectpathWithStartXML = projectpathWithStartXML.replace("\\", "/");
 													
 													projectHash.put(projectName, counter);
 													counter++;
 												}
-											//	System.out.println("project: "+projectpathWithStartXML);
+												
 												projectBean.setProjectpathWithStartXml(projectpathWithStartXML);
 												
 											}

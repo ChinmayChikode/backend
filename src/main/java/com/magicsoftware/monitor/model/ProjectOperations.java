@@ -9,7 +9,7 @@ public class ProjectOperations implements Serializable {
 	 */
 	private static final long serialVersionUID = -1287268661750370120L;
 
-	public String projectKey;
+	private String projectKey;
 	private String filePath;
 	private boolean loadInDebugMode;
 	private int timeout;
