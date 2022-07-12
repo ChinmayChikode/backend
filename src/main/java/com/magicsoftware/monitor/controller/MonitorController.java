@@ -1,8 +1,7 @@
 package com.magicsoftware.monitor.controller;
 
-import static java.util.stream.Collectors.toList;
-
 import java.io.PrintStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,14 +12,12 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +25,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.magicsoftware.monitor.model.ActivityLog;
+import com.magicsoftware.monitor.model.ActivityLogColor;
 import com.magicsoftware.monitor.model.ActivityMsgFilterMetadata;
+import com.magicsoftware.monitor.model.BamDetails;
+import com.magicsoftware.monitor.model.BamFilters;
 import com.magicsoftware.monitor.model.BpWithFlow;
 import com.magicsoftware.monitor.model.ChartBean;
 import com.magicsoftware.monitor.model.FlowDetails;
@@ -39,24 +39,25 @@ import com.magicsoftware.monitor.model.MagicXpiSpaceInstances;
 import com.magicsoftware.monitor.model.MessagesDetails;
 import com.magicsoftware.monitor.model.MonitorOfflineMetadata;
 import com.magicsoftware.monitor.model.ODSData;
+import com.magicsoftware.monitor.model.OdsDetails;
+import com.magicsoftware.monitor.model.PSSWithFLowName;
 import com.magicsoftware.monitor.model.ProjectBean;
 import com.magicsoftware.monitor.model.ProjectOperations;
 import com.magicsoftware.monitor.model.QueryFilters;
+import com.magicsoftware.monitor.model.SchedulerDetails;
 import com.magicsoftware.monitor.model.Series;
 import com.magicsoftware.monitor.model.ServerAndWorkerData;
 import com.magicsoftware.monitor.model.ServerDetails;
+import com.magicsoftware.monitor.model.ServerInstanceDetails;
 import com.magicsoftware.monitor.model.TriggerActivityGraphRes;
 import com.magicsoftware.monitor.model.TriggerDetails;
 import com.magicsoftware.monitor.query.QueryFactory;
-import com.magicsoftware.monitor.repository.ActivityLogRepo;
 import com.magicsoftware.monitor.service.ActivityLogService;
 import com.magicsoftware.monitor.service.SpaceService;
 import com.magicsoftware.monitor.serviceimpl.LicenseDetailsImpl;
 import com.magicsoftware.monitor.serviceimpl.LicenseSummaryImpl;
 import com.magicsoftware.monitor.serviceimpl.ODSDataServiceImpl;
-import com.magicsoftware.monitor.serviceimpl.SpaceServiceImpl;
 import com.magicsoftware.monitor.util.AllProjectsAdapter;
-import com.magicsoftware.monitor.util.MagicMonitorUtilities;
 import com.magicsoftware.xpi.server.common.ApplicationException;
 import com.magicsoftware.xpi.server.data.Lock;
 import com.magicsoftware.xpi.server.data.helpers.Alert;
@@ -87,12 +88,6 @@ public class MonitorController {
 
 	@Autowired
 	private ActivityLogService activityLogService;
-	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-
-	@Autowired
-	private ActivityLogRepo activityLogRepo;
 
 	@Autowired
 	private SpaceService spaceServiceService;
@@ -102,68 +97,67 @@ public class MonitorController {
 
 	@Autowired
 	private LicenseSummaryImpl licenseSummaryImpl;
-
+	
 	@Autowired
 	private LicenseDetailsImpl licenseDetailsImpl;
 
 	@GetMapping("/getLicenseProjectDetails/{projectKey:.+}/{type}")
-	public ChartBean getLicenseProjectDetails(@PathVariable @NotNull String projectKey,
-			@PathVariable @NotNull String type) {
+	public ChartBean getLicenseProjectDetails(@PathVariable @NotNull String projectKey, @PathVariable @NotNull String type) {
 		return licenseDetailsImpl.findLicenseDetails(projectKey, type);
 	}
-
+	
 	@GetMapping("/getLicenseListProjectDetails/{projectKey:.+}/{type}")
-	public List<LicenseDetails> getLicenseListProjectDetails(@PathVariable @NotNull String projectKey,
-			@PathVariable @NotNull String type) {
+	public List<LicenseDetails> getLicenseListProjectDetails(@PathVariable @NotNull String projectKey, @PathVariable @NotNull String type) {
 		return licenseDetailsImpl.findLicenseByProjectAndPeak(projectKey, type);
 	}
-
+	
 	@GetMapping("/getLicenseDefaultGraph/{projectKey:.+}")
 	public ChartBean getLicenseDefaultGraph(@PathVariable @NotNull String projectKey) {
 		return licenseDetailsImpl.findLicenseDetailsForDefaultGraph(projectKey);
 	}
-
+	
 	@GetMapping("/getPeaklicenseByHost/{projectKey:.+}")
 	public List<Series> getPeaklicenseByHost(@PathVariable @NotNull String projectKey) {
-		return licenseDetailsImpl.findLicenseDetailsForHost(projectKey);
+			return licenseDetailsImpl.findLicenseDetailsForHost(projectKey);
 	}
-
+	
 	@GetMapping("/getPeaklicenseByHostByRange/{projectKey:.+}")
-	public List<Series> getPeaklicenseByHostByRange(@PathVariable @NotNull String projectKey,
-			@RequestParam("sDate") @NotNull Date sDate, @RequestParam("eDate") @NotNull Date eDate) {
-		return licenseDetailsImpl.findLicenseDetailsForHostByRange(projectKey, sDate, eDate);
+	public List<Series> getPeaklicenseByHostByRange(@PathVariable @NotNull String projectKey, @RequestParam("sDate") @NotNull Date sDate, 
+			@RequestParam("eDate") @NotNull Date eDate) {
+			return licenseDetailsImpl.findLicenseDetailsForHostByRange(projectKey, sDate, eDate);
 	}
-
+	
 	@GetMapping("/getTotalPeaklicense/{projectKey:.+}")
 	public List<Series> getTotalPeaklicense(@PathVariable @NotNull String projectKey) {
 		return licenseDetailsImpl.findTotalLicenseDetails(projectKey, "Total Peak License");
 	}
-
+	
 	@GetMapping("/getDefaultPeaklicenseByRange/{projectKey}")
-	public ChartBean getDefaultPeaklicenseByRange(@PathVariable @NotNull String projectKey,
-			@RequestParam("sDate") @NotNull Date sDate, @RequestParam("eDate") @NotNull Date eDate) {
+	public ChartBean getDefaultPeaklicenseByRange(@PathVariable @NotNull String projectKey, @RequestParam("sDate") @NotNull Date sDate, 
+			@RequestParam("eDate") @NotNull Date eDate) {
 		return licenseDetailsImpl.findLicenseDetailsForDefaultGraphByRage(projectKey, sDate, eDate);
 	}
-
+	
+	
 	@GetMapping("/getLicenseProjectDetails/{type}")
 	public ChartBean getLicenseDetails(@PathVariable @NotNull String type) {
 		return licenseDetailsImpl.findLicenseDetails(type);
 	}
-
+	
 	@GetMapping("/getLicenseListProjectDetails/{projectKey}")
-	public List<LicenseDetails> getLicenseListProjectDetails(@PathVariable @NotNull String projectKey,
-			@RequestParam("sDate") @NotNull Date sDate, @RequestParam("eDate") @NotNull Date eDate) {
+	public List<LicenseDetails> getLicenseListProjectDetails(@PathVariable @NotNull String projectKey, @RequestParam("sDate") @NotNull Date sDate, 
+			@RequestParam("eDate") @NotNull Date eDate) {
 		return licenseDetailsImpl.findLicenseListDetailsByDate(projectKey, sDate, eDate);
 	}
-
+	
 	@GetMapping("/getLicenseProjectDetailsByDate")
-	public ChartBean getLicenseDetails(@RequestParam("sDate") @NotNull Date sDate,
+	public ChartBean getLicenseDetails(@RequestParam("sDate") @NotNull Date sDate, 
 			@RequestParam("eDate") @NotNull Date eDate) {
 		return licenseDetailsImpl.findLicenseDetails("custom", sDate, eDate);
 	}
-
+	
 	@GetMapping("/odsDataByProjectkey/{projectkey}")
-	public List<ODSData> odsDataByProjectkey(@PathVariable @NotNull String projectkey) {
+	public OdsDetails odsDataByProjectkey(@PathVariable @NotNull String projectkey) {
 		return oDSDataServiceImpl.findByprojectKey(projectkey);
 	}
 
@@ -175,8 +169,9 @@ public class MonitorController {
 	 */
 
 	@GetMapping("/odsDataByName")
-	public List<ODSData> odsDataByOdsname(@RequestParam String odsname) {
+	public List<ODSData> odsDataByOdsname(@RequestParam String odsname) {		
 		return oDSDataServiceImpl.findByuserKey(odsname);
+		
 	}
 
 	@GetMapping("/messageGraphDataPerProject")
@@ -198,11 +193,55 @@ public class MonitorController {
 	public FlowDetails flow(@RequestParam String projectKey, @RequestParam String projectLocation) {
 		return spaceServiceService.flow(projectKey, projectLocation);
 	}
+	
+//	@GetMapping("/userblob") 
+//	 public byte[] getUserBlob(@RequestParam String projectkey,@RequestParam int msgid)
+//	 { 
+//		 return activityLogService.findBlob(projectkey, msgid);
+//	 }
+	
+	
+	@GetMapping("/startServer/{projectKey}/{serverID}")
+	public String startServer(@PathVariable String projectKey, @PathVariable int serverID) {
+		SpaceServices spaceServices = new SpaceServices();
+		List<Status> statuses = Arrays.asList(Status.STOPPED);
+		spaceServices.startServer(projectKey, serverID, statuses);
+		return "";
+	}
+	
+	
+	
+	@RequestMapping(value="/demo")
+	public String demo() {
+		return "user_blob_file";
+	}
+	
+
+	@GetMapping("/displayblob")
+	public HashMap<String, String> getblob(@RequestParam @NotNull String projectKey,@RequestParam @NotNull int msgid){
+
+		 HashMap<String,String> result=new HashMap<String, String>();
+		 result.put("format", activityLogService.getBlob(projectKey,msgid));
+		 return result;
+
+	}
+	
+	@GetMapping("/displayOdsBlob")
+	public void getOdsBlob(@RequestParam @NotNull String projectKey,@RequestParam @NotNull double usernumber){
+
+		System.out.println("Call in dispay blob");
+		 oDSDataServiceImpl.getBlob(projectKey,usernumber);
+			System.out.println("Call done" );
+		 //return null;
+
+	}
+		
 
 	@GetMapping("/triggersByProject")
 	public TriggerDetails triggersByProject(@RequestParam String projectKey, @RequestParam String projectLocation) {
 		return spaceServiceService.triggersByProject(projectKey, projectLocation);
 	}
+
 
 	@GetMapping("/worker")
 	public WorkerData[] worker() {
@@ -313,16 +352,29 @@ public class MonitorController {
 		return spaceServiceService.getWorkersLocks(projectkey);
 	}
 
-	@GetMapping("/scheduler")
+	@GetMapping("/schedulers")
 	public Scheduler[] getScheduler() {
 		return spaceServiceService.getScheduler();
 	}
 
-	@GetMapping("/PSSData/{projectkey}")
-	public PSSData[] getPSSData(@PathVariable @NotNull String projectkey) {
-		return spaceServiceService.getPSSData(projectkey);
+	@GetMapping("/scheduler")
+	public SchedulerDetails getScheduler(@RequestParam String projectKey, @RequestParam String projectLocation) {
+		return spaceServiceService.getscheduler(projectKey,projectLocation);
+	}
+		
+	@GetMapping("/PSSData/")
+	public List<PSSWithFLowName> getPSSData(@RequestParam String projectKey,
+			@RequestParam String projectLocation) {
+		return spaceServiceService.getPSSDataWithFLowName(projectKey,projectLocation);
+		
 	}
 
+	@GetMapping("/activityLog/{projectkey}") 
+	 public BamDetails activityLog(@PathVariable @NotNull String projectkey)
+	 { 
+		 return activityLogService.findByProjectkey(projectkey);
+	 }
+	
 	@GetMapping("/flowReqHistory")
 	public FlowReqHistory[] getFlowReqHistory() {
 		return spaceServiceService.getFlowReqHistory();
@@ -352,6 +404,7 @@ public class MonitorController {
 	@GetMapping("/canWorkEnable/{projectKey}/{bpId}/{flowId}")
 	public boolean canWorkEnable(@PathVariable @NotNull String projectKey, @PathVariable long bpId,
 			@PathVariable long flowId) {
+		System.out.println("execting can work enable");
 		return spaceServiceService.canWorkEnable(projectKey, bpId, flowId);
 	}
 
@@ -361,16 +414,16 @@ public class MonitorController {
 		return spaceServiceService.canWorkBufferLimitation(projectKey, bpId, flowId, triggerStepId);
 	}
 
-	/*
-	 * @GetMapping("/activityLog/{projectkey}/{page}/{size}") public
-	 * List<ActivityLog> activityLog(@PathVariable @NotNull String
-	 * projectkey, @PathVariable Integer page, @PathVariable Integer size) { return
-	 * activityLogService.findByProjectkey(projectkey, PageRequest.of(page, size));
-	 * }
-	 */
+	
+//	  @GetMapping("/activityLog/{projectkey}/{page}/{size}") public
+//	  List<ActivityLog> activityLog(@PathVariable @NotNull String
+//	  projectkey, @PathVariable Integer page, @PathVariable Integer size) { return
+//	  activityLogService.findByProjectkey(projectkey, PageRequest.of(page, size));
+//	  }
+	 
 
 	@RequestMapping(path = "/activityLog", method = RequestMethod.POST, consumes = "application/json")
-	public List<ActivityLog> activityLog(@RequestBody QueryFilters queryFiltersDTO) {
+	public List<ActivityLogColor> activityLog(@RequestBody QueryFilters queryFiltersDTO) {
 		try {
 			return activityLogService.getMonitorActivityLog(queryFiltersDTO);
 		} catch (Exception e) {
@@ -378,82 +431,6 @@ public class MonitorController {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	@RequestMapping(path = "/activityLogPages", method = RequestMethod.POST, consumes = "application/json")
-	public Page<ActivityLog> activityLogPages(@RequestBody QueryFilters queryFilters) {
-		
-		if (queryFilters.getPage() == 0 && queryFilters.getSize() == 0) {
-			queryFilters.setPage(1);
-			queryFilters.setSize(50);
-		}
-		
-		PageRequest pageRequest = PageRequest.of(queryFilters.getPage(), queryFilters.getSize(), Sort.by("msgid").descending());
-		Page<ActivityLog> pageResult = activityLogRepo.findAll(pageRequest);
-		List<ActivityLog> activityLogList = pageResult.stream().map(ActivityLog::new).collect(toList());
-		
-		queryFilters.setActMsgFiltersMetadata(new ArrayList<ActivityMsgFilterMetadata>());
-		List<ActivityMsgFilterMetadata> activityMsgFilterMetadata = MagicMonitorUtilities
-				.readActMsgFiltersMetadata(queryFilters);
-		String messageTypeIdString = "";
-		for (int i = 0; i < activityMsgFilterMetadata.size(); i++) {
-			if (!activityMsgFilterMetadata.get(i).isDisplay()) {
-				messageTypeIdString = messageTypeIdString + activityMsgFilterMetadata.get(i).getMessageId() + ",";
-			}
-		}
-		
-		/*int totalRecordsCount = jdbcTemplate.queryForObject(queryFilters.getActivityLogCountQuery().toString(),
-				new Object[] {}, Integer.class);*/
-		
-		for (int i = 0; i < activityLogList.size(); i++) {
-
-			for (int j = 0; j < SpaceServiceImpl.monitorOfflineMetadata.getStepList().size(); j++) {
-				if (activityLogList.get(i).getFsstep() == Integer
-						.valueOf(SpaceServiceImpl.monitorOfflineMetadata.getStepList().get(j).getStepId())) {
-					activityLogList.get(i)
-							.setStepName(SpaceServiceImpl.monitorOfflineMetadata.getStepList().get(j).getStepName());
-				}
-			}
-			activityLogList.get(i)
-					.setMessageType(MagicMonitorUtilities.getMessageType(activityLogList.get(i).getMessagetypeid()));
-
-			activityLogList.get(i).setDisplayCreatedTime(
-					MagicMonitorUtilities.formatDate(activityLogList.get(i).getCreateTimeStamp()));
-
-			//activityLogList.get(i).setTotalNumberOfRecords(0L);
-
-			for (int j = 0; j < activityMsgFilterMetadata.size(); j++) {
-				if (activityLogList.get(i).getMessagetypeid() == activityMsgFilterMetadata.get(j).getMessageId()) {
-					activityLogList.get(i).setColor(activityMsgFilterMetadata.get(j).getColor());
-				}
-			}
-
-			BPLoop: for (int j = 0; j < SpaceServiceImpl.monitorOfflineMetadata.getBpList().size(); j++) {
-				if (SpaceServiceImpl.monitorOfflineMetadata.getBpList().get(j).getBpId() != null
-						&& activityLogList.get(i).getBpid() == Integer
-								.valueOf(SpaceServiceImpl.monitorOfflineMetadata.getBpList().get(j).getBpId())) {
-					activityLogList.get(i)
-							.setBpName(SpaceServiceImpl.monitorOfflineMetadata.getBpList().get(j).getBpName());
-					FlowLoop: for (int k = 0; k < SpaceServiceImpl.monitorOfflineMetadata.getFlowList().size(); k++) {
-						if (SpaceServiceImpl.monitorOfflineMetadata.getFlowList().get(k).getFlowId() != null
-								&& activityLogList.get(i).getFlowid() == Integer.valueOf(
-										SpaceServiceImpl.monitorOfflineMetadata.getFlowList().get(k).getFlowId())) {
-							activityLogList.get(i).setFlowName(
-									SpaceServiceImpl.monitorOfflineMetadata.getFlowList().get(k).getFlowName());
-							continue BPLoop;
-						}
-					}
-				}
-			}
-
-			if (activityLogList.get(i).getServerid() != null) {
-				activityLogList.get(i).setServerName("Server_" + activityLogList.get(i).getServerid());
-			}
-
-		}
-
-		return new PageImpl<>(activityLogList, pageRequest, pageResult.getTotalElements());
-
 	}
 
 	@RequestMapping(path = "/activityLogCount", method = RequestMethod.POST, consumes = "application/json")
@@ -477,12 +454,27 @@ public class MonitorController {
 		}
 		return 0;
 	}
+	
+	@GetMapping("/deleteServer/{projectKey}/{serverID}")
+	public void deleteServer(@PathVariable String projectKey, @PathVariable int serverID )
+	{
+		System.out.println(projectKey+serverID);
+		SpaceServices spaceServices = new SpaceServices();
+		List<Status> statuses = Arrays.asList(Status.STOPPED);
+		try {
+			spaceServices.deleteServer(projectKey,serverID,statuses);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	@RequestMapping(path = "/startProject", method = RequestMethod.POST, consumes = "application/json")
 	public String startProject(@RequestBody ProjectOperations projectOperations) {
 		RTVEntity r = connect();
 		PrintStream logs = null;
 		// filePath += "\\" + projectKey + "\\start.xml";
+		System.out.println(projectOperations.projectKey);
 		r.startProject(projectOperations.getFilePath(), projectOperations.isLoadInDebugMode(), logs);
 		return "";
 	}
@@ -560,17 +552,33 @@ public class MonitorController {
 		return "";
 	}
 
-	@GetMapping("/updateFlowStatus/{projectKey}/{bpId}/{flowId}/{isEnable}")
-	public String updateFlowStatus(@PathVariable String projectKey, @PathVariable int bpId, @PathVariable int flowId,
-			@PathVariable boolean isEnable) {
+	@GetMapping("/updateFlowStatus")
+	public boolean updateFlowStatus(@RequestParam String projectKey, @RequestParam int bpId, @RequestParam int flowId,
+			@RequestParam boolean isEnable) {
 		SpaceServices spaceServices = new SpaceServices();
 		try {
-			spaceServices.updateFlowEnableStatus(projectKey, bpId, flowId, isEnable);
+			return spaceServices.updateFlowEnableStatus(projectKey, bpId, flowId, isEnable);
+
 		} catch (ApplicationException e) {
-			e.printStackTrace(); // TODO ganesh :- need to change it with logger
+			e.printStackTrace();
+			return false;// TODO ganesh :- need to change it with logger
 		}
-		return "";
+
 	}
+	
+//	@PatchMapping("/updateFlowStatus/{projectKey}/{bpId}/{flowId}/{isEnable}")
+//	public String updateFlowStatus(@PathVariable String projectKey, @PathVariable int bpId, @PathVariable int flowId,
+//			@PathVariable boolean isEnable) {
+//		SpaceServices spaceServices = new SpaceServices();
+//		try {
+//			spaceServices.updateFlowEnableStatus(projectKey, bpId, flowId, isEnable);
+//			return "true";
+//		} catch (ApplicationException e) {
+//			e.printStackTrace(); 
+//			return "didnt get executed";// TODO ganesh :- need to change it with logger
+//		}
+//		
+//	}
 
 	@GetMapping("/stopServer/{projectKey}/{serverID}/{timeout}")
 	public String stopServer(@PathVariable String projectKey, @PathVariable int serverID, @PathVariable int timeout) {
@@ -582,7 +590,7 @@ public class MonitorController {
 
 	private RTVEntity connect() {// TODO ganesh :- remove this method
 		RTVEntity r = new RTVEntity();
-		r.connect("MAGIC_SPACE", "Magic_xpi_4.13_SUDEEPMLPT", "SUDEEPMLPT");
+		r.connect("MAGIC_SPACE", "Magic_xpi_4.13_CHINMAYCLPT", "localhost");
 		r.isMonitorLicensed();
 		return r;
 	}
@@ -603,8 +611,8 @@ public class MonitorController {
 			ServerData serverChild = serverdetail.getServerData()[0];
 			projectBean.setProjectKey(projectData.getProjectKey());
 			projectBean.setProjectLocation(serverChild.getProjectsDirectory() + "\\" + serverChild.getProjectKey());
-			// projectBean.setProjectLocation("");
-			// projectBean.setWorkers(serverChild.getNumberOfWorkers() + "");
+			//projectBean.setProjectLocation("");
+			//projectBean.setWorkers(serverChild.getNumberOfWorkers() + "");
 			projectBean.setWorkers("");
 			projectBean.setReserverLivenseThread(projectData.getReservedLicenseThreads() + "");
 			projectBean.setStatus(projectData.getProjectState().toString());
@@ -613,10 +621,10 @@ public class MonitorController {
 			projectBean.setMessages("");
 			projectBean.setAlert("");
 			projectBean.setCurrentLicenseThread("");
-			// projectBean.setLoadInDebugMode(serverChild.getLoadInDebugMode());
+			//projectBean.setLoadInDebugMode(serverChild.getLoadInDebugMode());
 			projectBean.setLoadInDebugMode(false);
 			projectBean.setServerdetail(serverdetail);
-			// projectBean.setWorkerDetais(spaceServiceService.worker());
+			//projectBean.setWorkerDetais(spaceServiceService.worker());
 			projectList.add(projectBean);
 		}
 		return projectList;
@@ -707,6 +715,110 @@ public class MonitorController {
 	@GetMapping("/summary/{projectkey}")
 	public Object getFlowReqHistory(@PathVariable @NotNull String projectkey) {
 		return spaceServiceService.getSummary(projectkey);
+		
 	}
+	
+//		@GetMapping("/activityLog/{projectkey}") 
+//		 public ArrayList<ActivityLog> bamDetails(@PathVariable @NotNull String projectkey)
+//		 { 
+//			 return activityLogService.getBamDetails(projectkey);
+//		 }
+		
+		//method to get data according to filter
+		
+//		@RequestMapping(path = "/filteredBamLog", method = RequestMethod.POST, consumes = "application/json")
+//		public List<ActivityLog> filteredBamDetails(@RequestBody QueryFilters queryFiltersDTO) {	
+//				String userkey1 = queryFiltersDTO.getUserkey1();
+//				String userkey2 = queryFiltersDTO.getUserkey2();
+//				String projectkey = queryFiltersDTO.getProjKey();
+//				String fromDate = queryFiltersDTO.getLblFromDateValue();
+//				String toDate = queryFiltersDTO.getLblToDateValue();
+//				
+//				System.out.println("values to be filtered are : "+ userkey1 + userkey2 + projectkey+fromDate+toDate);
+//				return activityLogService.getFilteredBamDetails(projectkey,userkey1,userkey2);				
+//				return activityLogService.getFilteredBamDetails(projectkey,userkey1,userkey2,fromDate,toDate);
+//		}
+			
+//			try {
+//				return activityLogService.getMonitorActivityLog(queryFiltersDTO);
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			return null;
+//			
+//		}
+	
+	
+	//Method for BAM filte
+		@RequestMapping(path = "/filteredBamLog", method = RequestMethod.POST, consumes = "application/json")
+		public List<ActivityLog> filteredBamDetails(@RequestBody BamFilters bamFilters) throws ParseException{
+			 
+//			System.out.println(data);
+//			BamFilters bamFilters=new BamFilters();
+			System.out.println(bamFilters.getProjKey());	
+			
+			String ProjKey = bamFilters.getProjKey() ;
+		//	String ProjLocation = bamFilters.getProjLocation() ;
+			String userkey1 = bamFilters.getUserkey1() ;
+			String userkey2 = bamFilters.getUserkey2() ;
+			String lblFromDateValue = bamFilters.getLblFromDateValue() ;
+			String lblToDateValue = bamFilters.getLblToDateValue() ;
+			
+				 System.out.println("lblFromDateValue is :::::"+lblFromDateValue+":::end");	
+				 System.out.println("lblToDateValue is :::::"+lblToDateValue+":::end");	
+				
+				 //filter according to dates
+				if(lblFromDateValue.length() != 0 && lblToDateValue.length() != 0 && userkey1.length() == 0 && userkey2.length() == 0) {
+					System.out.println("filtering by date called...");
+					return activityLogService.getFilteredBamDetailsOnDate(ProjKey,lblFromDateValue,lblToDateValue);
+				}
+				
+				//filter on userkey
+				else if(lblFromDateValue.length() == 0 && lblToDateValue.length() == 0 && userkey1.length() != 0 && userkey2.length() != 0) {
+					 System.out.println("filtering by userkey called...");
+					return activityLogService.getFilteredBamDetailsOnUserkey(ProjKey,userkey1,userkey2);
+				}
+				
+				//filter on all parameters
+				else if(lblFromDateValue.length() != 0 && lblToDateValue.length() != 0 && userkey1.length() != 0 && userkey2.length() != 0) {
+					 System.out.println("filtering on all parameters...");
+					 return activityLogService.getFilteredBamDetailsOnAll(ProjKey,lblFromDateValue,lblToDateValue,userkey1,userkey2);
+					//return activityLogService.getFilteredBamDetailsOnUserkey(projKey,userkey1,userkey2);
+				}
+				else 
+				return null;
+				
+		//	return activityLogService.getFilteredBamDetails(projKey,userkey1,userkey2);
+				
+		 }
+		@GetMapping("/newServerInstance/{projectkey}")
+		public String newServerInstancetest(@PathVariable("projectkey") @NotNull String projectkey,@RequestParam String Server_host, @RequestParam String Alternate_host,
+				@RequestParam String project_directory,@RequestParam int Number_of_instances,@RequestParam Boolean Load_triggers,
+				@RequestParam Boolean Load_Schedulers,@RequestParam Boolean Load_auto_start,@RequestParam int Number_of_workers){
+			
+//			System.out.println(projectkey+" "+ Server_host +" " + Alternate_host + " " + project_directory + " " + 
+//					Number_of_instances + " " + Load_triggers + " " + Load_Schedulers + " " + Load_auto_start + " " + Number_of_workers);
 
+			
+			return spaceServiceService.newServerInstance(projectkey,Server_host, Alternate_host,
+					 project_directory,Number_of_instances, Load_triggers,Load_Schedulers, Load_auto_start, Number_of_workers);
+
+			
+		}
+		
+		
+		@GetMapping("/invokeFlowByScheduler/")
+		public int invokeFlowByScheduler(@RequestParam String projectKey,@RequestParam int bpId,@RequestParam int flowId
+		,@RequestParam int triggerId,@RequestParam int schedulerId) throws InstantiationException, IllegalAccessException, ApplicationException {
+			
+			System.out.println("projectKey:"+projectKey+" "+"BpId:"+bpId +" "+"FlowId:"+flowId+" "+"triggerId:"+triggerId+" "+"schedulerId:"+schedulerId);
+			
+			return spaceServiceService.invokeFlowByScheduler(projectKey, bpId, flowId, triggerId, schedulerId);
+		}
+
+
+			
 }
+
+

@@ -13,9 +13,12 @@ import com.magicsoftware.monitor.model.MagicXpiHostAndEngines;
 import com.magicsoftware.monitor.model.MagicXpiSpaceInstances;
 import com.magicsoftware.monitor.model.MessagesDetails;
 import com.magicsoftware.monitor.model.MonitorOfflineMetadata;
+import com.magicsoftware.monitor.model.PSSWithFLowName;
 import com.magicsoftware.monitor.model.QueryFilters;
+import com.magicsoftware.monitor.model.SchedulerDetails;
 import com.magicsoftware.monitor.model.ServerAndWorkerData;
 import com.magicsoftware.monitor.model.ServerDetails;
+import com.magicsoftware.monitor.model.ServerInstanceDetails;
 import com.magicsoftware.monitor.model.TriggerActivityGraphRes;
 import com.magicsoftware.monitor.model.TriggerDetails;
 import com.magicsoftware.xpi.server.common.ApplicationException;
@@ -38,11 +41,17 @@ import com.magicsoftware.xpi.server.messages.PSSData;
 
 public interface SpaceService {
 
+	public String newServerInstance(String projectkey, String Server_host, String Alternate_host,
+			 String project_directory, int Number_of_instances, Boolean Load_triggers,
+		     Boolean Load_Schedulers, Boolean Load_auto_start, int Number_of_workers);
+	
 	public FlowDetails flow(String projectKey, String projectLocation);
 
 	public ProjectData[] runningProject();
 
 	public WorkerData[] worker();
+	
+	public WorkerData[] worker_practice();
 
 	public ServerData[] servers(String projectKey);
 
@@ -63,6 +72,10 @@ public interface SpaceService {
 	public Lock[] getWorkersLocks(String projectkey);
 
 	public Scheduler[] getScheduler();
+	
+	public SchedulerDetails getscheduler(String projectKey, String projectLocation);
+	
+	public int invokeFlowByScheduler(String projectKey, int bpId, int flowId, int triggerId, int schedulerId) throws InstantiationException, IllegalAccessException, ApplicationException;
 
 	public PSSData[] getPSSData(String projectKey);
 
@@ -121,5 +134,7 @@ public interface SpaceService {
 	TriggerActivityGraphRes getTriggersActivityStatistics(String projectkey, String filterType);
 
 	Object getSummary(@NotNull String projectkey);
+
+	List<PSSWithFLowName> getPSSDataWithFLowName(String projectKey, String projectLocation);
 
 }
